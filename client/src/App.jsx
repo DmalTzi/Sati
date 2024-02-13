@@ -6,7 +6,7 @@ function App() {
   const [data, setDate] = useState([])
 
   async function recvDate(){
-    const response = await axios.get("http://localhost:8080/api/send")
+    const response = await axios.get(`${import.meta.env.VITE_APP_API}/api/send`)
     setDate(response.data)
   }
 
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <>
-      <h1>Vite + React</h1>
+      <h1>การปลูกพืชในโรงเรือน</h1>
       <p>วันที่ {data.date} เวลา {data.time}</p>
       <div className="card">
         <p>
@@ -29,8 +29,12 @@ function App() {
           อุณหภูมิ : {data.temperature}℃
         </p>
         <p>
-          ความชื้นในดิน : {data.soli_moisture}
+          ความชื้นเฉลี่ยในดิน : {data.soil_moisture}%
         </p>
+        <p>สถานะตัววัดความชื้นจุดที่ 1 : {String(data.device1_status)}</p>
+        <p>สถานะตัววัดความชื้นจุดที่ 2 : {String(data.device2_status)}</p>
+        <p>สถานะตัววัดความชื้นจุดที่ 3 : {String(data.device3_status)}</p>
+        <p>สถานะตัววัดความชื้นจุดที่ 4 : {String(data.device4_status)}</p>
       </div>
     </>
   )
