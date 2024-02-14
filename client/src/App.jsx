@@ -11,7 +11,6 @@ function App() {
         const response = await axios.get(
             `${import.meta.env.VITE_APP_API}/send`
         );
-        console.log(response);
         setDate(response.data);
     }
 
