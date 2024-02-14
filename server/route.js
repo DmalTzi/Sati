@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const router = require("express").Router();
 const Data = require("./models/Data");
-const XLSX = require("xlsx")
+const XLSX = require("xlsx");
 
 let datas = {
     device1: [0],
@@ -9,8 +9,6 @@ let datas = {
     device3: [0],
     device4: [0],
 };
-
-let excelSheets =[]
 
 let device1_status = false;
 let device2_status = false;
@@ -32,29 +30,21 @@ function checkStatus(d1, d2, d3, d4) {
 }
 
 const downloadExcel = async (data) => {
-    const writeSheet = XLSX.utils.json_to_sheet(data)
-    const writeBook = XLSX.utils.book_new()
-
-    XLSX.utils.book_append_sheet(writeBook, writeSheet, "Sheet1")
-
-    return excelData = await XLSX.write(writeBook, { bookType: "xlsx", type: "buffer" })
-}
-
-async function classified(datas){
-    // console.log(datas)
-    for( j of datas){
-        date = new Date(j.createdAt).toLocaleDateString()
-        excelSheets[date] = []
-        keys = Object.keys(excelSheets)
-        // for(k of keys){
-        //     if(date == keys){
-        //         excelSheets[keys].push(j)
-        //     }
-        // }
+    const writeBook = XLSX.utils.book_new(); // create book
+    for (k in data) {
+        // Object.keys(data).forEach((d, ind) => {
+        //     console.log(data[d]);
+        // });
+        const writeSheet = XLSX.utils.json_to_sheet(data[k]);
+        const newKeys = k.replaceAll("/", "_");
+        XLSX.utils.book_append_sheet(writeBook, writeSheet, `${newKeys}`);
     }
-    return excelSheets
-    console.log(excelSheets)
-}
+
+    return (excelData = await XLSX.write(writeBook, {
+        bookType: "xlsx",
+        type: "buffer",
+    }));
+};
 
 cron.schedule("*/30 * * * *", async () => {
     console.log("Save Data2DB");
@@ -89,12 +79,32 @@ cron.schedule("*/30 * * * *", async () => {
     };
 });
 
-router.get("/excel",async(req,res)=>{
-    const data = await Data.find()
-    excelSheets = await classified(data)
-    res.status(200).json(excelSheets)
-})
-
+router.get("/excel", async (req, res) => {
+    let excelSheets = {};
+    const datas = await Data.find();
+    // defind date' key
+    for (d of datas) {
+        date = new Date(d.createdAt).toLocaleDateString();
+        excelSheets[date] = [];
+    }
+    // check date and append to array
+    for (j of datas) {
+        date = new Date(j.createdAt).toLocaleDateString();
+        keys = Object.keys(excelSheets);
+        for (k of keys) {
+            if (date == k) {
+                rowData = {
+                    เวลา: new Date(j.createdAt).toLocaleTimeString(),
+                    ความชื้นในอากาศ: j.humidity,
+                    อุณหภูมิอากาศ: j.temperature,
+                    ความชื้นเฉลี่ยในดิน: j.soil_moisture,
+                };
+                excelSheets[k].push(rowData);
+            }
+        }
+    }
+    res.status(200).end(await downloadExcel(excelSheets));
+});
 router.get("/send", (req, res) => {
     device1 = datas.device1.slice(-1)[0];
     device2 = datas.device2.slice(-1)[0];

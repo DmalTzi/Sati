@@ -9,10 +9,31 @@ function App() {
 
     async function recvDate() {
         const response = await axios.get(
-            `${import.meta.env.VITE_APP_API}/api/send`
+            `${import.meta.env.VITE_APP_API}/send`
         );
-        console.log(response)
+        console.log(response);
         setDate(response.data);
+    }
+
+    async function downloadExcelFile(response, category) {
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_APP_API}/excel`,
+                {
+                    responseType: "blob", // Set responseType to 'blob' to receive binary data.
+                }
+            );
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `ExcelSatiFile.xlsx`; // Set the desired filename.
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error downloading Excel file: ", error);
+        }
     }
 
     useEffect(() => {
@@ -56,6 +77,9 @@ function App() {
                         />
                     </div>
                 </div>
+                <button className="btn" onClick={downloadExcelFile}>
+                    ดาวน์โหลดข้อมูลนักเรียนในระบบ
+                </button>
             </div>
         </>
     );

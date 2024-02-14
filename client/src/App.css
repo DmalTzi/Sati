@@ -101,3 +101,13 @@ nav{
 p{
     margin: 5px 0;
 }
+
+.btn{
+    margin-top: 2rem;
+    background-color: greenyellow;
+    border: none;
+    padding: 1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: 1000;
+}
