@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 const router = require("express").Router();
 const Data = require("./models/Data");
+const XLSX = require("xlsx")
 
 let datas = {
     device1: [0],
@@ -8,6 +9,8 @@ let datas = {
     device3: [0],
     device4: [0],
 };
+
+let excelSheets =[]
 
 let device1_status = false;
 let device2_status = false;
@@ -27,7 +30,33 @@ function checkStatus(d1, d2, d3, d4) {
     d3 != 0 ? (device3_status = true) : (device3_status = false);
     d4 != 0 ? (device4_status = true) : (device4_status = false);
 }
-cron.schedule("* * * * *", async () => {
+
+const downloadExcel = async (data) => {
+    const writeSheet = XLSX.utils.json_to_sheet(data)
+    const writeBook = XLSX.utils.book_new()
+
+    XLSX.utils.book_append_sheet(writeBook, writeSheet, "Sheet1")
+
+    return excelData = await XLSX.write(writeBook, { bookType: "xlsx", type: "buffer" })
+}
+
+async function classified(datas){
+    // console.log(datas)
+    for( j of datas){
+        date = new Date(j.createdAt).toLocaleDateString()
+        excelSheets[date] = []
+        keys = Object.keys(excelSheets)
+        // for(k of keys){
+        //     if(date == keys){
+        //         excelSheets[keys].push(j)
+        //     }
+        // }
+    }
+    return excelSheets
+    console.log(excelSheets)
+}
+
+cron.schedule("*/30 * * * *", async () => {
     console.log("Save Data2DB");
     // avg
     device1 = datas.device1.slice(-1)[0];
@@ -59,6 +88,12 @@ cron.schedule("* * * * *", async () => {
         device4: [0],
     };
 });
+
+router.get("/excel",async(req,res)=>{
+    const data = await Data.find()
+    excelSheets = await classified(data)
+    res.status(200).json(excelSheets)
+})
 
 router.get("/send", (req, res) => {
     device1 = datas.device1.slice(-1)[0];

@@ -23,7 +23,7 @@ nav{
     align-items: center;
     justify-content: center;
     border-radius: 100%;
-    padding: 2%;
+    padding: 1%;
 }
 
 .logo img{
@@ -38,7 +38,7 @@ nav{
 
   @media only screen and (min-width: 900px) {
     .logo{
-        width: 5%;
+        width: 3%;
     }
   }
 
@@ -84,6 +84,10 @@ nav{
     padding: 6px;
     width: 30%;
     margin: 6px;
+}
+
+.device-status-card p{
+    color: white;
 }
 
 .red{
