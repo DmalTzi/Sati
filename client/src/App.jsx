@@ -77,7 +77,7 @@ function App() {
                     </div>
                 </div>
                 <button className="btn" onClick={downloadExcelFile}>
-                    ดาวน์โหลดข้อมูลนักเรียนในระบบ
+                    ดาวน์โหลดข้อมูล
                 </button>
             </div>
         </>

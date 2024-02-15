@@ -46,7 +46,7 @@ const downloadExcel = async (data) => {
     }));
 };
 
-cron.schedule("*/30 * * * *", async () => {
+cron.schedule("*/5 * * * *", async () => {
     console.log("Save Data2DB");
     // avg
     device1 = datas.device1.slice(-1)[0];
@@ -61,7 +61,10 @@ cron.schedule("*/30 * * * *", async () => {
             device3_status +
             device4_status +
             all_not_on);
-    result = (((1024 - avg) / 708.25) * 100).toFixed(2);
+
+    avg === 0
+        ? (result = 0)
+        : (result = (((1024 - avg) / 708.25) * 100).toFixed(2));
     // create data base
     await Data.create({
         humidity: humi_data.slice(-1)[0],
@@ -120,7 +123,9 @@ router.get("/send", (req, res) => {
             device3_status +
             device4_status +
             all_not_on);
-    result = (((1024 - avg) / 708.25) * 100).toFixed(2);
+    avg === 0
+        ? (result = 0)
+        : (result = (((1024 - avg) / 708.25) * 100).toFixed(2));
     res.status(200).json({
         humidity: humi_data.slice(-1)[0],
         temperature: temp_date.slice(-1)[0],
